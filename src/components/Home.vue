@@ -1,21 +1,7 @@
 <template>
-    <div id="home">
-        {{ hello }}
-        <button
-            @click="addCount"
-            class="
-                w-max
-                rounded
-                border-2
-                bg-indigo-400
-                text-white
-                px-3
-                py-1
-                my-4
-            "
-        >
-            Add +
-        </button>
+    <div id="home" class="container-col-center">
+        <h1 class="title">{{ hello }}</h1>
+        <button @click="addCount" class="button">Add +</button>
         <div>Count: {{ count }}</div>
     </div>
 </template>
@@ -36,10 +22,19 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.container-col-center {
+    @apply flex flex-col justify-center items-center;
+}
+
 #home {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    .title {
+        @apply text-4xl mb-8 font-semibold;
+    }
+    .button {
+        @apply w-max rounded border-2 bg-indigo-400 text-white px-3 py-1 my-4 transition-all duration-300;
+    }
+    .button:hover {
+        @apply bg-indigo-500;
+    }
 }
 </style>
