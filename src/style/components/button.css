@@ -1,0 +1,20 @@
+@layer components {
+    .button {
+        @apply px-3 py-1 my-4 text-white transition-all duration-300 bg-indigo-400 border-2 rounded;
+    }
+    .button:hover {
+        @apply bg-indigo-500;
+    }
+    .button-secondary {
+        @apply px-3 py-1 my-4 text-white transition-all duration-300 bg-gray-400 border-2 rounded;
+    }
+    .button-secondary:hover {
+        @apply bg-gray-500;
+    }
+    .button-round {
+        @apply px-3 py-1 my-4 text-white transition-all duration-300 bg-gray-400 border-2 rounded-full;
+    }
+    .button-round:hover {
+        @apply bg-gray-500;
+    }
+}

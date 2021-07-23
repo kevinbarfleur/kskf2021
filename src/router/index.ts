@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Home from '../components/Home.vue'
+import Home from '@/views/Home.vue'
+import Supabase from '@/views/Supabase.vue'
 
 const routes = [
     {
@@ -8,7 +9,14 @@ const routes = [
         name: 'Home',
         component: Home,
     },
+    {
+        path: '/supabase',
+        name: 'Supabase',
+        component: Supabase,
+    },
+    // TODO: add a fallback route 404
 ]
+
 const router = createRouter({
     history: createWebHistory(),
     routes,

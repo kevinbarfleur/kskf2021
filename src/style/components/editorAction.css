@@ -1,0 +1,8 @@
+@layer components {
+    .editor-action {
+        @apply p-1 m-1 text-xs text-white transition-all duration-300 bg-gray-400 border-2 rounded;
+    }
+    .editor-action:hover {
+        @apply bg-gray-500;
+    }
+}

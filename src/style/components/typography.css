@@ -1,0 +1,5 @@
+@layer components {
+    .heading-4xl {
+        @apply mb-8 text-4xl font-semibold;
+    }
+}
