@@ -3,6 +3,6 @@
         @apply py-1 my-4 text-indigo-400 transition-colors duration-300;
     }
     .link:hover {
-        @apply text-indigo-500;
+        @apply text-indigo-500 cursor-pointer;
     }
 }

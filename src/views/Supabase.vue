@@ -1,70 +1,139 @@
 <template>
-    <div class="flex flex-col items-stretch">
+    <div class="flex flex-col items-stretch mb-12">
         <router-link class="link" to="/">← Back to home</router-link>
-        <h2 class="mb-24 font-serif text-4xl">Supabase</h2>
+        <h2 class="mb-12 font-serif text-4xl">Supabase</h2>
+        <div class="link login" @click="isLogged = !isLogged">
+            {{ isLogged ? 'Log out' : 'Log in' }}
+        </div>
 
-        <!-- <TipTap /> -->
+        <div class="edit-action">
+            <div
+                class="flex items-center justify-start action button w-min"
+                v-if="isLogged && !isEdited"
+                @click="isEdited = true"
+            >
+                <PencilIcon class="w-5 h-5 m-0 mr-2 text-dark-300" />
+                Edition
+            </div>
+            <div
+                class="flex items-center justify-start action button w-min"
+                v-if="isLogged && isEdited"
+                @click="isEdited = false"
+            >
+                <EyeIcon class="w-5 h-5 m-0 mr-2 text-dark-300" />
+                Preview
+            </div>
+        </div>
 
-        <div
-            class="content-container"
-            v-for="index in numberOfBlocks"
-            :key="index"
-        >
+        <div :class="contentClass" v-for="index in blocks.length" :key="index">
             <TextEditor
                 v-if="blocks[index - 1]"
                 @update="updateContent"
+                @delete="removeBlock"
                 :defaultContent="blocks[index - 1]"
+                :isEdited="isEdited"
+                :isLoading="isLoading"
+                :target="target"
             ></TextEditor>
+            <div class="line" v-if="index < blocks.length && isEdited"></div>
         </div>
 
-        <!-- <button class="button" @click="addBlock">New block</button> -->
-
-        <!-- <div class="image-container" v-for="(url, index) in urls" :key="index">
-            <img :src="url" alt="" />
-        </div> -->
+        <button class="button" v-if="isEdited" @click="addBlock">
+            New block
+        </button>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import TipTap from '@/components/Tiptap.vue'
-import TextEditor from '../components/TextEditor.vue'
+import useContent from '../plugins/useContent'
+import TextEditor from '@/components/TextEditor.vue'
 
-import {
-    getImagesSources,
-    getTableContent,
-    updateTableContent,
-} from '../plugins/supabase'
+import { PencilIcon, EyeIcon } from '@heroicons/vue/solid'
 
 export default defineComponent({
-    components: { TextEditor, TipTap },
+    components: {
+        TextEditor,
+        PencilIcon,
+        EyeIcon,
+    },
     data() {
         return {
             urls: new Array(),
-            blocks: new Array(),
-            numberOfBlocks: 1,
+            isEdited: false,
+            isLogged: false,
         }
     },
+    setup() {
+        const {
+            content: blocks,
+            update: updateContent,
+            addRow: addRow,
+            deleteRow: deleteRow,
+            isLoading: isLoading,
+            target: target,
+        } = useContent()
+
+        return {
+            blocks,
+            isLoading,
+            target,
+            updateContent,
+            addRow,
+            deleteRow,
+        }
+    },
+    watch: {
+        isLogged() {
+            if (!this.isLogged) {
+                this.isEdited = false
+            }
+        },
+    },
+    computed: {
+        contentClass() {
+            if (this.isEdited) {
+                return 'content-container-edited'
+            }
+            return ''
+        },
+    },
     methods: {
-        async getImages() {
-            this.urls = await getImagesSources('content-images')
-        },
-        async getContent() {
-            this.blocks = await getTableContent('content')
-        },
-        async updateContent(value: string) {
-            updateTableContent('content', { value: 'Hello' }, value)
-        },
         addBlock() {
-            this.numberOfBlocks += 1
+            this.addRow()
+        },
+        removeBlock(id: string) {
+            this.deleteRow(id)
         },
     },
-    mounted() {
-        this.getImages()
-        this.getContent()
-    },
+    // https://fr.vuejs.org/v2/guide/instance.html#Diagramme-du-cycle-de-vie
 })
 </script>
 
-<style></style>
+<style lang="postcss" scoped>
+.loader {
+    min-height: 86.86px;
+}
+.content-container-edited {
+    position: relative;
+    background-color: white;
+    z-index: 1;
+}
+.line {
+    z-index: 0;
+    position: absolute;
+    background-color: lightgray;
+    width: 1px;
+    height: 75px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%) translateY(calc(100% + 0px));
+}
+
+.login {
+    position: fixed;
+    top: 0px;
+    right: 24px;
+}
+</style>

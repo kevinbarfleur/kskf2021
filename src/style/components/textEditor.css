@@ -1,0 +1,8 @@
+@layer components {
+    .content-container-edited {
+        @apply pt-10 pb-4 pl-4 pr-4 my-4 transition duration-300 ease-in-out border-0 border-gray-100 rounded-md shadow;
+    }
+    .content-container-edited:hover {
+        @apply shadow-lg;
+    }
+}

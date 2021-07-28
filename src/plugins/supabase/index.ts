@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { App } from 'vue'
+import { App, inject } from 'vue'
 
 const supabaseUrl = 'https://nuevwrtcdfttakmhimwl.supabase.co'
 
@@ -41,22 +41,84 @@ export async function getTableContent(name: string) {
 }
 
 export async function updateTableContent(
-    name: string,
-    toUpdate: object,
-    newContent: string
+    tableName: string,
+    value: string,
+    toUpdate: string
 ) {
-    const { error } = await supabase
-        .from(name)
-        .update({ content: newContent })
-        .filter('name', 'eq', toUpdate.value)
+    const { data, error } = await supabase
+        .from(tableName)
+        .update({ content: value })
+        .filter('id', 'eq', toUpdate)
 
     if (error) console.error(error)
+
+    return data
 }
 
+export async function addContentRow(table: string, content: string) {
+    const { data, error } = await supabase
+        .from(table)
+        .insert([{ content: content }])
+
+    if (error) console.error(error)
+
+    return data
+}
+
+export async function deleteContentRow(
+    table: string,
+    toDelete: { id: number }
+) {
+    const { data, error } = await supabase
+        .from(table)
+        .delete()
+        .filter('id', 'eq', toDelete.id)
+
+    if (error) console.error(error)
+
+    console.log(toDelete)
+
+    return data
+}
+
+// GLOBAL PROPERTIES
 // export default {
 //     install(app: App, options: Object) {
-//         app.config.globalProperties.$supabase = supabase
-
-//         app.provide('supabase', options)
+//         app.config.globalProperties.$db = {
+//             getTableContent,
+//             updateTableContent,
+//         }
 //     },
 // }
+
+// // INJECT/PROVIDE
+// export const SYMBOL_DB = Symbol('$db')
+// export default {
+//     install(app: App, options: Object) {
+//         app.provide(SYMBOL_DB, {
+//             getTableContent,
+//             updateTableContent,
+//         })
+//     },
+// }
+
+type Db = {
+    getTableContent: Function
+    updateTableContent: Function
+    addContentRow: Function
+    deleteContentRow: Function
+}
+export const SYMBOL_DB = Symbol('$db')
+export default {
+    install(app: App, options: Object) {
+        app.provide<Db>(SYMBOL_DB, {
+            getTableContent,
+            updateTableContent,
+            addContentRow,
+            deleteContentRow,
+        })
+    },
+}
+export function useDb(): Db {
+    return inject<Db>(SYMBOL_DB) as Db
+}

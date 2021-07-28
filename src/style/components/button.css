@@ -3,7 +3,7 @@
         @apply px-3 py-1 my-4 text-white transition-all duration-300 bg-indigo-400 border-2 rounded;
     }
     .button:hover {
-        @apply bg-indigo-500;
+        @apply bg-indigo-500 cursor-pointer;
     }
     .button-secondary {
         @apply px-3 py-1 my-4 text-white transition-all duration-300 bg-gray-400 border-2 rounded;
