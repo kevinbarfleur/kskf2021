@@ -35,7 +35,7 @@
                 :isLoading="isLoading"
                 :target="target"
             ></TextEditor>
-            <div class="line" v-if="index < blocks.length && isEdited"></div>
+            <div class="line" v-if="isEdited"></div>
         </div>
 
         <button class="button" v-if="isEdited" @click="addBlock">
@@ -125,7 +125,7 @@ export default defineComponent({
     position: absolute;
     background-color: lightgray;
     width: 1px;
-    height: 75px;
+    height: 45px;
     left: 50%;
     bottom: 0;
     transform: translateX(-50%) translateY(calc(100% + 0px));
