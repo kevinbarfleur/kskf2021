@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-stretch mb-12">
+    <div class="flex flex-col items-stretch px-24 mb-12">
         <router-link class="link" to="/">← Back to home</router-link>
         <h2 class="mb-12 font-serif text-4xl">Supabase</h2>
         <div class="link login" @click="isLogged = !isLogged">
@@ -25,18 +25,34 @@
             </div>
         </div>
 
-        <div :class="contentClass" v-for="index in blocks.length" :key="index">
-            <TextEditor
-                v-if="blocks[index - 1]"
-                @update="updateContent"
-                @delete="removeBlock"
-                :defaultContent="blocks[index - 1]"
-                :isEdited="isEdited"
-                :isLoading="isLoading"
-                :target="target"
-            ></TextEditor>
-            <div class="line" v-if="isEdited"></div>
-        </div>
+        <draggable
+            :list="blockList"
+            item-key="id"
+            @change="handleReorder"
+            class="list-group"
+            tag="transition-group"
+            :component-data="{
+                tag: 'div',
+                type: 'transition-group',
+                name: !drag ? 'flip-list' : null,
+            }"
+            v-bind="dragOptions"
+        >
+            <template #item="{ element }">
+                <div :class="contentClass">
+                    <TextEditor
+                        v-if="element"
+                        @update="updateContent"
+                        @delete="removeBlock"
+                        :defaultContent="element"
+                        :isEdited="isEdited"
+                        :isLoading="isLoading"
+                        :target="target"
+                    ></TextEditor>
+                    <div class="line" v-if="isEdited"></div>
+                </div>
+            </template>
+        </draggable>
 
         <button class="button" v-if="isEdited" @click="addBlock">
             New block
@@ -47,22 +63,25 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
+import { PencilIcon, EyeIcon } from '@heroicons/vue/solid'
+import draggable from 'vuedraggable'
+
 import useContent from '../plugins/useContent'
 import TextEditor from '@/components/TextEditor.vue'
-
-import { PencilIcon, EyeIcon } from '@heroicons/vue/solid'
 
 export default defineComponent({
     components: {
         TextEditor,
         PencilIcon,
         EyeIcon,
+        draggable,
     },
     data() {
         return {
-            urls: new Array(),
-            isEdited: false,
-            isLogged: false,
+            blockList: new Array(),
+            isEdited: true,
+            isLogged: true,
+            drag: false,
         }
     },
     setup() {
@@ -90,6 +109,10 @@ export default defineComponent({
                 this.isEdited = false
             }
         },
+        blocks() {
+            this.blockList = this.blocks
+            console.log('Globaly Updated')
+        },
     },
     computed: {
         contentClass() {
@@ -98,6 +121,14 @@ export default defineComponent({
             }
             return ''
         },
+        dragOptions() {
+            return {
+                animation: 200,
+                group: 'description',
+                disabled: false,
+                ghostClass: 'ghost',
+            }
+        },
     },
     methods: {
         addBlock() {
@@ -105,6 +136,26 @@ export default defineComponent({
         },
         removeBlock(id: string) {
             this.deleteRow(id)
+        },
+        handleReorder(event: {
+            moved: { oldIndex: number; newIndex: number }
+        }) {
+            const oldElem = this.blocks[event.moved.oldIndex]
+            const newElem = this.blocks[event.moved.newIndex]
+
+            const oldContent = {
+                value: newElem.content,
+                itemId: oldElem.id,
+            }
+            const newContent = {
+                value: oldElem.content,
+                itemId: newElem.id,
+            }
+
+            // this.blockList[event.moved.oldIndex] = oldContent
+            // this.blockList[event.moved.newIndex] = newContent
+
+            this.updateContent([oldContent, newContent])
         },
     },
     // https://fr.vuejs.org/v2/guide/instance.html#Diagramme-du-cycle-de-vie
@@ -135,5 +186,15 @@ export default defineComponent({
     position: fixed;
     top: 0px;
     right: 24px;
+}
+.flip-list-move {
+    transition: transform 0.5s;
+}
+.no-move {
+    transition: transform 0s;
+}
+.ghost {
+    /* opacity: 0.5; */
+    background: #ecf9ff;
 }
 </style>

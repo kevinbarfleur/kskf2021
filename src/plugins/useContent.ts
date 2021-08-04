@@ -3,7 +3,7 @@ import { useDb } from './supabase'
 
 export default function useContent() {
     const db = useDb()
-    const content = ref('')
+    const content = ref([])
     const isLoading = ref(false)
     const target = ref(0)
 
@@ -16,15 +16,13 @@ export default function useContent() {
         isLoading.value = false
     }
 
-    async function update(updateValues: { value: string; itemId: number }) {
+    async function update(updateValues: any[]) {
         if (isLoading.value) return
         isLoading.value = true
-        await db.updateTableContent(
-            'content',
-            updateValues.value,
-            updateValues.itemId
-        )
-        target.value = updateValues.itemId
+        for (let item of updateValues) {
+            await db.updateTableContent('content', item.value, item.itemId)
+            target.value = item.itemId
+        }
         isLoading.value = false
         fetch()
     }

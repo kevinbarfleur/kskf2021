@@ -18,7 +18,6 @@
             v-if="isEdited"
             v-model:content="content"
             contentType="html"
-            @textChange="handleContent"
             theme="snow"
         />
         <div class="prose content" v-html="content" v-else></div>
@@ -47,7 +46,7 @@ export default defineComponent({
             toolbarOptions: [
                 [{ header: [1, 2, 3, 4, 5, 6, false] }],
                 [{ size: ['small', false, 'large', 'huge'] }],
-                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code'],
                 [{ list: 'ordered' }, { list: 'bullet' }],
 
                 [{ color: [] }, { background: [] }],
@@ -59,19 +58,18 @@ export default defineComponent({
         }
     },
     computed: {
-        isLocalLoading() {
+        isLocalLoading(): boolean {
             return this.isLoading && this.target === this.defaultContent?.id
         },
     },
     methods: {
-        handleContent() {
-            // console.log(this.content)
-        },
         saveBlock() {
-            this.$emit('update', {
-                value: this.content,
-                itemId: this.defaultContent?.id,
-            })
+            this.$emit('update', [
+                {
+                    value: this.content,
+                    itemId: this.defaultContent?.id,
+                },
+            ])
         },
         deleteBlock() {
             this.$emit('delete', { id: this.defaultContent?.id })
